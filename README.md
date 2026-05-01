@@ -14,7 +14,6 @@ Simple cli multivariable integrator built on top of `SymPy`.
 - Bounds follow the format: `lower,upper`
 - Leaving bounds empty computes an **indefinite integral**.
 - Expressions are parsed using SymPy, so standard mathematical syntax applies.
-- Supports additional functions such as `rect`, `u`/`step`, `tri`, etc.
 - Includes additional signal-processing functions:
   - `rect` (rectangular pulse)
   - `tri` (triangular pulse)
