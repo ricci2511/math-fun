@@ -75,19 +75,18 @@ def main():
         lower = parse_expr(l)
         upper = parse_expr(u)
 
-        if lower != -upper:
-            bounds.append((symb, lower, upper))
-            continue
-
         # Handle symmetric interval
-        parity = get_parity(expr, symb)
-        if parity == -1:
-            bounds.append((symb, 0, 0)) # Yield zero
-            continue
-        if parity == 1:
-            bounds.append((symb, 0, upper)) # [-a,a] -> [0,a]
-            factor *= 2
-            continue
+        if lower == -upper:
+            parity = get_parity(expr, symb)
+            if parity == -1:
+                bounds.append((symb, 0, 0)) # Yield zero
+                continue
+            if parity == 1:
+                bounds.append((symb, 0, upper)) # [-a,a] -> [0,a]
+                factor *= 2
+                continue
+
+        bounds.append((symb, lower, upper))
 
     integral = factor * sp.Integral(expr, *bounds)
 
@@ -95,7 +94,11 @@ def main():
     sp.pprint(integral)
 
     print("\nResult:")
-    sp.pprint(integral.doit())
+    res = integral.doit()
+    sp.pprint(res)
+
+    print("\nSimplified:")
+    sp.pprint(sp.simplify(res))
 
 if __name__ == "__main__":
     main()
