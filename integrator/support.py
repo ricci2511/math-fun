@@ -2,16 +2,31 @@ import sympy as sp
 from signals import rect, tri
 
 def get_heaviside_support(f, var):
-    arg = f.args[0]
-    return sp.solve_univariate_inequality(arg >= 0, var).as_set()
+    try:
+        arg = f.args[0]
+        return sp.solve_univariate_inequality(arg >= 0, var).as_set()
+    except:
+        raise NotImplementedError(
+            f"Cannot determine support of {f} wrt {var}"
+        )
 
 def get_rect_support(f, var):
-    arg = f.args[0]
-    return sp.solve_univariate_inequality(sp.Abs(arg) <= sp.Rational(.5), var).as_set()
+    try:
+        arg = f.args[0]
+        return sp.solve_univariate_inequality(sp.Abs(arg) <= sp.Rational(.5), var).as_set()
+    except:
+        raise NotImplementedError(
+            f"Cannot determine support of {f} wrt {var}"
+        )
 
 def get_tri_support(f, var):
-    arg = f.args[0]
-    return sp.solve_univariate_inequality(sp.Abs(arg) <= 1, var).as_set()
+    try:
+        arg = f.args[0]
+        return sp.solve_univariate_inequality(sp.Abs(arg) <= 1, var).as_set()
+    except:
+        raise NotImplementedError(
+            f"Cannot determine support of {f} wrt {var}"
+        )
 
 support_mappers = {
     sp.Heaviside: get_heaviside_support,
