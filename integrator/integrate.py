@@ -1,24 +1,12 @@
 import sympy as sp
-
-def rect(t):
-    return sp.Piecewise(
-        (1, sp.Abs(t) <= sp.Rational(.5)),
-        (0, True)
-    )
-    # TODO: Does not fair well with parity check :(
-    # return sp.Heaviside(t + sp.Rational(.5)) - sp.Heaviside(t - sp.Rational(.5))
-
-def tri(t):
-    return sp.Piecewise(
-        (1 - sp.Abs(t), sp.Abs(t) <= 1),
-        (0, True)
-    )
+from signals import rect, tri, lower_signals
+from support import get_support
 
 # Holds any symbols defined in the given expression
 # Initialized with some helpful functions used in signal processing
 symbol_dict = {
     "u": sp.Heaviside,
-    "Heavside": sp.Heaviside,
+    "Heaviside": sp.Heaviside,
     "step": sp.Heaviside,
     "sgn": sp.sign,
     "sign": sp.sign,
@@ -74,13 +62,22 @@ def main():
         l, u = bound.split(',');
         lower = parse_expr(l)
         upper = parse_expr(u)
+        support = get_support(expr, symb)
+        merged_support = sp.Intersection(support, sp.Interval(lower, upper))
+        if merged_support.is_empty:
+            bounds = []
+            factor = 0 # Over empty set -> 0
+            break
+        lower = merged_support.inf
+        upper = merged_support.sup
 
-        # Handle symmetric interval
-        if lower == -upper:
+        # Exploit symmetries
+        if sp.simplify(lower + upper) == 0:
             parity = get_parity(expr, symb)
             if parity == -1:
-                bounds.append((symb, 0, 0)) # Yield zero
-                continue
+                bounds = []
+                factor = 0 # Odd over symmetric interval -> 0
+                break
             if parity == 1:
                 bounds.append((symb, 0, upper)) # [-a,a] -> [0,a]
                 factor *= 2
@@ -88,6 +85,7 @@ def main():
 
         bounds.append((symb, lower, upper))
 
+    expr = lower_signals(expr)
     integral = factor * sp.Integral(expr, *bounds)
 
     print("\n")
