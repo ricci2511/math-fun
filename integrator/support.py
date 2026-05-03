@@ -54,7 +54,7 @@ def get_support(expr, var):
             return sp.S.Reals
 
         sets = []
-        for arg in expr.args:
+        for arg in relevant_args:
             sets.append(get_support(arg, var))
         return sp.Intersection(*sets)
     
